@@ -4,6 +4,12 @@ A docker compose file, and associated configuration, to run GOV.UK Notify locall
 This README needs some love and may not be in an intuitive order. Please read the entire document top-to-bottom before trying to set up your environment. Please update this README if you think something is missing, in the wrong place, or poorly described =)
 
 ## Initial setup
+0) Make sure you install pass (https://www.passwordstore.org/)
+   Make sure you have docker installed
+   Make sure you have your github ssh key installed.
+   Generate a gpg key to use for your pass password store.
+   Check out/create a credentials repository with pass. (`pass git init` etc)
+   To run the sms stub, install go as well `brew install go`
 
 1) Clone this repository alongside your existing Notify repositories (if any).
     ```
@@ -19,6 +25,8 @@ This README needs some love and may not be in an intuitive order. Please read th
     ```
 
     Manually make sure that each of those repositories are on the `main` branch and on the latest commit.
+
+2a) Make sure you run `npm install` in the root of notifications-admin, so it can install its dependencies before it builds the docker image.
 
 3) Each of the services needs to have some environment variables defined. We have template .env files in the root of the repository a helper script automates generating real .env into the `./private` directory files from those templates, prompting for input as required. These should obviously never be committed and is excluded in `.gitignore`.
 
@@ -52,6 +60,8 @@ This README needs some love and may not be in an intuitive order. Please read th
 The default way to bring up a local version of GOV.UK Notify, after following setup, is to run `make up` from the root of this repository. This will start notify-api, notify-api-celery, notify-admin, template-preview-api, template-preview-celery, document-download-api, and document-download-preview, which will cover 95%+ of the things you need.
 
 To also run and enable antivirus scanning, run `make antivirus up`. To run and enable celery-beat for regularly-scheduled tasks, run `make beat up`. To run and enable the sms-provider-stub, run `make sms-provider-stub up`. These can be combined to `make beat antivirus sms-provider-stub up` to run *everything*.
+
+If you are on mac, the airplay receiver also runs on port 7000 - so switch that off in case you get errors that this port is already in use.
 
 ### Accessing your local Notify services
 
@@ -91,3 +101,17 @@ For example, if you've added a breakpoint into one of the apps and you've trigge
   * template-preview-api The requested image's platform (linux/amd64) does not match the detected host platform (linux/arm64/v8) and no specific platform was requested    0.0s
   * antivirus-api The requested image's platform (linux/amd64) does not match the detected host platform (linux/arm64/v8) and no specific platform was requested           0.0s
   * template-preview-celery The requested image's platform (linux/amd64) does not match the detected host platform (linux/arm64/v8) and no specific platform was requested 0.0s
+
+
+# Follow the following steps to set up an account:
+
+1. Install pgadmin https://www.pgadmin.org/
+2. Connect to localhost:5433
+3. Go to the domain table and make a link with an organisation for the user you want to create an account for, to the domain part (after the @) of the emailadres. For example, gmail.com, for `38e4bf69-93b0-445d-acee-53ea53fe02df`.
+4. Go to the services table and add your email_from (the first part, before @gmail.com for example) so it will build the right sender address. (see step 3).
+5. Make sure you add these manually to the amazon console in the SES (since it is in sandbox mode, it can only send out to registered addresses).
+6. In the service_sms_senders table, make sure that the GOVUK sender (ending with service_id 553) has the sms_sender does not have a Notify or GOV.UK name - since those are blocked by firetext everywhere outside GDS.
+7. Adjust the notify.tools domain to a domain you control in the config of notifications-api, for example:
+`NOTIFY_EMAIL_DOMAIN = "gmail.com"`
+8. In this config file, you can also point at the SMS stub if you are running it:
+`MMG_URL = os.environ.get("MMG_URL", "http://localhost:6300/mmg")`

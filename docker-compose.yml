@@ -327,7 +327,7 @@ services:
     networks:
       apps:
         aliases:
-          - notify.localhost
+          - notify-stub.localhost
 
 networks:
   db:
