@@ -12,8 +12,12 @@
       },
       "pathMappings": [
         {
-          "localRoot": "../../notifications-api",
+          "localRoot": "${workspaceFolder:notifications-api}",
           "remoteRoot": "/home/vcap/app"
+        },
+        {
+          "localRoot": "${workspaceFolder:notifications-utils}",
+          "remoteRoot": "/home/vcap/utils"
         }
       ]
     },
@@ -21,14 +25,19 @@
       "name": "[Notify] Admin",
       "type": "debugpy",
       "request": "attach",
+      "logToFile": true,
       "connect": {
         "host": "notify.localhost",
         "port": 5679
       },
       "pathMappings": [
         {
-          "localRoot": "../../notifications-admin",
+          "localRoot": "${workspaceFolder:notifications-admin}",
           "remoteRoot": "/home/vcap/app"
+        },
+        {
+          "localRoot": "${workspaceFolder:notifications-utils}",
+          "remoteRoot": "/home/vcap/utils"
         }
       ]
     }
