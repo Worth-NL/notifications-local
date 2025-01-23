@@ -34,6 +34,7 @@ services:
       - ../notifications-utils:/home/vcap/utils
     ports:
       - "6011:6011"
+      - "5678:5678"
     command: ["api-local"]
     stdin_open: true
     tty: true
@@ -146,6 +147,7 @@ services:
         - NOTIFY_ENVIRONMENT=development
     ports:
       - "6012:6012"
+      - "5679:5678"
     command: ["web-local"]
     stdin_open: true
     tty: true
@@ -193,6 +195,7 @@ services:
 
   document-download-frontend:
     image: document-download-frontend
+    platform: linux/amd64
     container_name: document-download-frontend
     volumes:
       - ../document-download-frontend:/home/vcap/app

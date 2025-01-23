@@ -1,0 +1,36 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "[Notify] API",
+      "type": "debugpy",
+      "request": "attach",
+      "logToFile": true,
+      "connect": {
+        "host": "notify-api.localhost",
+        "port": 5678
+      },
+      "pathMappings": [
+        {
+          "localRoot": "../../notifications-api",
+          "remoteRoot": "/home/vcap/app"
+        }
+      ]
+    },
+    {
+      "name": "[Notify] Admin",
+      "type": "debugpy",
+      "request": "attach",
+      "connect": {
+        "host": "notify.localhost",
+        "port": 5679
+      },
+      "pathMappings": [
+        {
+          "localRoot": "../../notifications-admin",
+          "remoteRoot": "/home/vcap/app"
+        }
+      ]
+    }
+  ]
+}
