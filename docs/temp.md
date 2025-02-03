@@ -14,3 +14,8 @@ Some modifications need to be done to the database in order to avoid issues with
 Connect to the now-running database via whichever client you like ([can be done via VSCode as described in the recommended extensions section](vscode.md#recommended-extensions)).
 
 Run the queries listed in the [dbfix.sql](../scripts/dbfix.sql) file.
+
+### Python virtual environment
+
+### Project build
+
