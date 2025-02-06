@@ -138,6 +138,7 @@ services:
     container_name: notify-admin
     volumes:
       - ../notifications-admin:/home/vcap/app
+      - /home/vcap/app/node_modules/
       - ../notifications-utils:/home/vcap/utils
     build:
       context: ../notifications-admin
