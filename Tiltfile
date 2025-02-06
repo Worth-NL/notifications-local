@@ -23,11 +23,11 @@ if config.tilt_subcommand == 'up':
   # Repo fixes
   ## General
   if not os.path.exists(path='./data/db'):
-    local(command='mkdir -p ./data/db')
+    local(command='mkdir -p ./data/db', quiet=True, echo_off=True)
 
   need_version_file = ['document-download-api', 'document-download-frontend', 'notifications-admin', 'notifications-antivirus', 'notifications-api', 'notifications-template-preview']
   for repo in need_version_file:
-    local(command="make generate-version-file", dir='../{}'.format(repo))
+    local(command="make generate-version-file", dir='../{}'.format(repo), quiet=True, echo_off=True)
 
   ## Admin
   # local(command='rm -rf node_modules package-lock.json', dir='../notifications-admin')
@@ -46,20 +46,17 @@ if config.tilt_subcommand == 'up':
   current_utils_branch = str(local(command='git branch --show-current', dir='../notifications-utils')).strip()
 
   if current_utils_branch != utils_version:
-    local(command='git checkout {}'.format(utils_version), dir='../notifications-utils')
-
+    local(command='git checkout {}'.format(utils_version), dir='../notifications-utils', quiet = True)
 
 ## Venv
-  local(command='pip install uv')
+  local(command='pip install uv', quiet=True, echo_off=True)
 
   if not os.path.exists(path='./.venv'):
-    local(command='uv venv')
+    local(command='uv venv', quiet=True, echo_off=True)
 
-  os.putenv('VIRTUAL_ENV', os.path.realpath('./.venv'))
-
-  local(command='uv pip install -r requirements_for_test.txt', dir='../notifications-admin')
-  local(command='uv pip uninstall notifications-utils', dir='../notifications-admin')
-  local(command='uv pip install -e ../notifications-utils', dir='../notifications-admin')
+  local(command='./scripts/venv_wrapper.sh uv pip install -r ../notifications-admin/requirements_for_test.txt')
+  local(command='./scripts/venv_wrapper.sh uv pip uninstall notifications-utils')
+  local(command='./scripts/venv_wrapper.sh uv pip install -e ../notifications-utils --config-settings editable_mode=compat')
 
 # Docker compose
 os.environ['DC_ANTIVIRUS'] = 'ANTIVIRUS_ENABLED=0'
