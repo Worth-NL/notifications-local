@@ -30,6 +30,7 @@ if config.tilt_subcommand == 'up':
     local(command="make generate-version-file", dir='../{}'.format(repo))
 
   ## Admin
+  # local(command='rm -rf node_modules package-lock.json', dir='../notifications-admin')
   local(command='npm install', dir='../notifications-admin')
   local(command='npm run build', dir='../notifications-admin')
 
@@ -45,7 +46,20 @@ if config.tilt_subcommand == 'up':
   current_utils_branch = str(local(command='git branch --show-current', dir='../notifications-utils')).strip()
 
   if current_utils_branch != utils_version:
-    local(command='git checkout tags/{} -b {}'.format(utils_version, utils_version), dir='../notifications-utils')
+    local(command='git checkout {}'.format(utils_version), dir='../notifications-utils')
+
+
+## Venv
+  local(command='pip install uv')
+
+  if not os.path.exists(path='./.venv'):
+    local(command='uv venv')
+
+  os.putenv('VIRTUAL_ENV', os.path.realpath('./.venv'))
+
+  local(command='uv pip install -r requirements_for_test.txt', dir='../notifications-admin')
+  local(command='uv pip uninstall notifications-utils', dir='../notifications-admin')
+  local(command='uv pip install -e ../notifications-utils', dir='../notifications-admin')
 
 # Docker compose
 os.environ['DC_ANTIVIRUS'] = 'ANTIVIRUS_ENABLED=0'

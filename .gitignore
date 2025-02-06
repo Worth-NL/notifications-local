@@ -3,3 +3,7 @@ data
 *.swp
 *.env
 private/
+
+
+# macOS-specific files
+*.DS_Store
