@@ -59,8 +59,8 @@ if config.tilt_subcommand == 'up':
     local(command="make generate-version-file", dir='../{}'.format(repo), quiet=True, echo_off=True)
 
   ## Admin
-  local(command='npm install', dir='../notifications-admin')
-  local(command='npm run build', dir='../notifications-admin')
+  local(command='npm install', dir='../notifications-admin', env={'NOTIFY_ENVIRONMENT': 'development'})
+  local(command='npm run build', dir='../notifications-admin', env={'NOTIFY_ENVIRONMENT': 'development'})
 
   ## Utils
   utils_version = 'main'
@@ -101,7 +101,7 @@ docker_compose('./docker-compose.yml', profiles=profiles)
 ## defaults
 dc_resource('db', labels=['plumbing'], trigger_mode=TRIGGER_MODE_MANUAL)
 dc_resource('redis', labels=['plumbing'], trigger_mode=TRIGGER_MODE_MANUAL)
-dc_resource('notify-api', labels=['notify'], links=['http://notify-api.localhost:6011', 'http://notify-api.localhost:5678'], resource_deps=['notify-api-db-migration', 'db', 'redis', 'template-preview-api'], infer_links=False)
+dc_resource('notify-api-db-migration', labels=['plumbing'], trigger_mode=TRIGGER_MODE_MANUAL, resource_deps=['db'])
 dc_resource('document-download-api', labels=['document-download'], links=['http://api.document-download.localhost:7000'], infer_links=False)
 dc_resource('document-download-frontend', labels=['document-download'], links=['http://frontend.document-download.localhost:7001'], resource_deps=['document-download-api'], infer_links=False)
 dc_resource('template-preview-api', labels=['template-preview'], links=['http://template-preview-api.localhost:6013'], infer_links=False)
@@ -109,7 +109,7 @@ dc_resource('template-preview-celery', labels=['template-preview'], resource_dep
 
 ## From 'notify-api' profile
 if 'notify-api' in profiles:
-  dc_resource('notify-api-db-migration', labels=['plumbing'], trigger_mode=TRIGGER_MODE_MANUAL, resource_deps=['db'])
+  dc_resource('notify-api', labels=['notify'], links=['http://notify-api.localhost:6011', 'http://notify-api.localhost:5678'], resource_deps=['notify-api-db-migration', 'db', 'redis', 'template-preview-api'], infer_links=False)
   dc_resource('notify-api-celery', labels=['notify'], resource_deps=['db', 'redis'])
 
 ## From 'notify-admin' profile
