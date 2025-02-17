@@ -29,6 +29,8 @@ services:
   notify-api:
     image: notifications-api
     container_name: notify-api
+    profiles:
+      - notify-api
     volumes:
       - ../notifications-api:/home/vcap/app
       - ../notifications-utils:/home/vcap/utils
@@ -82,6 +84,8 @@ services:
   notify-api-celery:
     image: notifications-api
     container_name: notify-api-celery
+    profiles:
+      - notify-api
     volumes:
       - ../notifications-api:/home/vcap/app
       - ../notifications-utils:/home/vcap/utils
@@ -136,6 +140,8 @@ services:
   notify-admin:
     image: notifications-admin
     container_name: notify-admin
+    profiles:
+      - notify-admin
     volumes:
       - ../notifications-admin:/home/vcap/app
       - /home/vcap/app/node_modules/

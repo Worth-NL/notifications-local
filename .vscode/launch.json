@@ -2,7 +2,44 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "[Notify] API",
+      "name": "[Local] API",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "flask",
+      "cwd": "${workspaceFolder:notifications-api}",
+      "envFile":"${workspaceFolder:notifications-local}/private/notify-api.env",
+      "env": {
+        "SQLALCHEMY_DATABASE_URI": "postgresql://notify:notify@localhost:5433/notifynl_api",
+        "REDIS_URL": "redis://localhost:6380/0",
+      },
+      "args": [
+        "run",
+        "--port", "6011"
+      ],
+      "jinja": true,
+      "autoStartBrowser": false
+    },
+    {
+      "name": "[Local] Admin",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "flask",
+      "cwd": "${workspaceFolder:notifications-admin}",
+      "envFile":"${workspaceFolder:notifications-local}/private/notify-admin.env",
+      "env": {
+        "REDIS_URL": "redis://localhost:6380/0",
+        "ASSET_PATH": "/static/",
+        "NOTIFY_ENVIRONMENT": "development",
+      },
+      "args": [
+        "run",
+        "--port", "6012"
+      ],
+      "jinja": true,
+      "autoStartBrowser": false
+    },
+    {
+      "name": "[Docker] API",
       "type": "debugpy",
       "request": "attach",
       "logToFile": true,
@@ -22,7 +59,7 @@
       ]
     },
     {
-      "name": "[Notify] Admin",
+      "name": "[Docker] Admin",
       "type": "debugpy",
       "request": "attach",
       "logToFile": true,
