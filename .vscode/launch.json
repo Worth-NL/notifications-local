@@ -20,6 +20,25 @@
       "autoStartBrowser": false
     },
     {
+      "name": "[Local] API celery",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "celery",
+      "cwd": "${workspaceFolder:notifications-api}",
+      "envFile":"${workspaceFolder:notifications-local}/private/notify-api.env",
+      "env": {
+        "PYCURL_SSL_LIBRARY":"openssl", "LDFLAGS":"-L/opt/homebrew/opt/openssl@3/lib", 
+        "CPPFLAGS":"-I/opt/homebrew/opt/openssl@3/include",
+        "SQLALCHEMY_DATABASE_URI": "postgresql://notify:notify@localhost:5433/notifynl_api",
+        "REDIS_URL": "redis://localhost:6380/0",
+      },
+      "args": [
+        "--quiet", "-A", "run_celery.notify_celery", "worker", "--logfile=/dev/null", "--concurrency=4"
+      ],
+      "jinja": true,
+      "autoStartBrowser": false
+    },
+    {
       "name": "[Local] Admin",
       "type": "debugpy",
       "request": "launch",
@@ -76,6 +95,17 @@
           "localRoot": "${workspaceFolder:notifications-utils}",
           "remoteRoot": "/home/vcap/utils"
         }
+      ]
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Admin group",
+      "configurations": [
+        "[Local] API",
+        "[Local] API celery",
+        "[Local] Admin",
+        // Add more configuration names as needed
       ]
     }
   ]
