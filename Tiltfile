@@ -50,6 +50,9 @@ if config.tilt_subcommand == 'up':
   for repo in repo_list:
     if not os.path.exists(path='../{}'.format(repo)):
       git_checkout(repository_url='{}{}'.format(repo_base, repo), checkout_dir='../{}'.format(repo))
+    
+    local(command='git fetch', dir='../{}'.format(repo), quiet=True)
+    
     if repo in merge_list:
       print('Checking out merge branch for {}'.format(repo))
       local(command='git checkout alphagovMerge', dir='../{}'.format(repo))
