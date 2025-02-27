@@ -24,10 +24,21 @@ repo_list = [
   'document-download-api',
   'document-download-frontend',
   'notifications-antivirus',
-  'notifications-utils',
   'notifications-sms-provider-stub',
+  'notifications-utils',
   'notifynl-frontend',
-  'notifynl-frontend-jinja'
+  'notifynl-frontend-package',
+  'LandRegistry-frontend-jinja'
+]
+
+merge_list = [
+  'notifications-admin',
+  'notifications-template-preview',
+  'notifications-api',
+  'notifications-antivirus',
+  'notifications-sms-provider-stub',
+  'document-download-api',
+  'document-download-frontend',
 ]
 
 load('ext://git_resource', 'git_checkout')
@@ -39,9 +50,14 @@ if config.tilt_subcommand == 'up':
   for repo in repo_list:
     if not os.path.exists(path='../{}'.format(repo)):
       git_checkout(repository_url='{}{}'.format(repo_base, repo), checkout_dir='../{}'.format(repo))
-      if repo == 'notifynl-frontend-jinja':
-        local(command='git checkout notifynl/rijkshuisstijl', dir='../{}'.format(repo), quiet=True, echo_off=True)
-
+    if repo in merge_list:
+      print('Checking out merge branch for {}'.format(repo))
+      local(command='git checkout alphagovMerge', dir='../{}'.format(repo))
+    if repo == 'notifications-utils':
+      local(command='git checkout alphagovMerge9401', dir='../{}'.format(repo), quiet=True)
+    if repo == 'notifynl-frontend':
+      local(command='git checkout merge5.7.1', dir='../{}'.format(repo), quiet=True, echo_off=True)
+      
   # Repo fixes
   ## General
   if not os.path.exists(path='./data/db'):
@@ -73,8 +89,8 @@ if config.tilt_subcommand == 'up':
 
   current_utils_branch = str(local(command='git branch --show-current', dir='../notifications-utils')).strip()
 
-  if current_utils_branch != utils_version:
-    local(command='git checkout {}'.format(utils_version), dir='../notifications-utils', quiet = True)
+  # if current_utils_branch != utils_version:
+  #   local(command='git checkout {}'.format(utils_version), dir='../notifications-utils', quiet = True)
 
 ## Venv
   local(command='pip install uv', quiet=True, echo_off=True)
@@ -85,8 +101,9 @@ if config.tilt_subcommand == 'up':
   local(command='./scripts/venv_wrapper.sh uv pip install -r ../notifications-admin/requirements_for_test.txt', quiet=True)
   local(command='./scripts/venv_wrapper.sh uv pip uninstall notifications-utils', quiet=True)
   local(command='./scripts/venv_wrapper.sh uv pip install -e ../notifications-utils --config-settings editable_mode=compat', quiet=True)
+  local(command='./scripts/venv_wrapper.sh uv pip install -r ../notifications-api/requirements_for_test.txt', quiet=True)
   local(command='./scripts/venv_wrapper.sh uv pip uninstall govuk-frontend-jinja')
-  local(command='./scripts/venv_wrapper.sh uv pip install -e ../notifynl-frontend-jinja --config-settings editable_mode=compat')
+  local(command='./scripts/venv_wrapper.sh uv pip install -e ../LandRegistry-frontend-jinja --config-settings editable_mode=compat')
 
 # Docker compose
 os.environ['DC_ANTIVIRUS'] = 'ANTIVIRUS_ENABLED=0'
@@ -145,6 +162,13 @@ cmd_button('notify-admin:npm build',
            text='NPM build'
 )
 
+cmd_button('notify-admin:npm watch',
+           argv=['/bin/sh', '-c', 'cd ../notifications-admin && npm run watch'],
+           resource='notify-admin',
+           icon_name='folder_eye',
+           text='NPM watch'
+)
+
 cmd_button('notify-api:utils fix',
            argv=['docker', 'exec', 'notify-admin', '/bin/sh', '-c', 'sudo pip install -e /home/vcap/utils'],
            resource='notify-api',
@@ -157,3 +181,5 @@ cmd_button(name='nav-open-code',
            text='Open VSCode',
            location=location.NAV,
            icon_name='code')
+
+           
