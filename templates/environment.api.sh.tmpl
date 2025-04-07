@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# Generated via ../notifications-local/generate-env-files.sh
+## Get vars from .env file
+ENV_FILE_1="../notifications-local/private/notify-api.env"
+ENV_FILE_2="../notifications-local/private/local-aws-creds.env"
+
+export_env_vars() {
+    local env_file=$1
+
+    if [ ! -f "$env_file" ]; then
+        echo "Error: $env_file not found!"
+        return 1
+    fi
+
+    while IFS='=' read -r key value; do
+        if [[ -n "$key" && ! "$key" =~ ^# ]]; then
+            export "$key=$value"
+            echo "Exported $key from $env_file"
+        fi
+    done < "$env_file"
+}
+
+export_env_vars "$ENV_FILE_1"
+export_env_vars "$ENV_FILE_2"
+
+## Base config
+export S3_BUCKET_CONTACT_LIST='notifynl-dev-contact-list'
+export S3_BUCKET_CSV_UPLOAD='notifynl-dev-csv-upload'
+export S3_BUCKET_DVLA_RESPONSE='notifynl-dev-tools-ftp'
+export S3_BUCKET_INVALID_PDF='notifynl-dev-letters-invalid-pdf'
+export S3_BUCKET_LETTERS_PDF='notifynl-dev-letters-pdf'
+export S3_BUCKET_LETTERS_SCAN='notifynl-dev-letters-scan'
+export S3_BUCKET_LETTER_SANITISE='notifynl-dev-letters-sanitise'
+export S3_BUCKET_TEST_LETTERS='notifynl-dev-test-letters'
+export S3_BUCKET_TRANSIENT_UPLOADED_LETTERS='notifynl-dev-transient-uploaded-letters'
+export SESSION_COOKIE_SECURE='True'
+export SESSION_PROTECTION='basic'
+## Sensitive config
+export REDIS_URL='redis://localhost:6380/0'
+export SQLALCHEMY_DATABASE_URI=postgresql://notify:notify@localhost:5433/notifynl_api

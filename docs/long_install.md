@@ -28,7 +28,7 @@
 
 #### Ubuntu
 ```sh
-sudo apt install build-essential curl git pass
+sudo apt install build-essential curl git pass zlib1g-dev libbz2-dev libncurses-dev libffi-dev libreadline-dev libsqlite3-dev tk-dev liblzma-dev zlib1g-dev libssl-dev libgdbm-dev libnss3-dev libgdbm-compat-dev uuid-dev libcurl4-openssl-dev
 ```
 
 #### MacOS
@@ -53,13 +53,13 @@ You may skip this step if you want to handle your own versions of things.
 #### Installing the required tools via ASDF
 
 ```sh
-for i in 'awscli azure-cli dotnet-core helm kubectl nodejs python tilt'; do
+for i in awscli azure-cli dotnet-core helm kubectl nodejs python tilt; do
     asdf plugin add $i
 done
 ```
 
 ```sh
-for i in 'awscli azure-cli helm kubectl tilt' do
+for i in awscli azure-cli helm kubectl tilt do
     asdf install $i latest
     asdf set --home $i latest
 done

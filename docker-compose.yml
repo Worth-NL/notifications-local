@@ -30,7 +30,9 @@ services:
     image: notifications-api
     container_name: notify-api
     profiles:
-      - notify-api
+      - full
+      - lite
+      - api
     volumes:
       - ../notifications-api:/home/vcap/app
       - ../notifications-utils:/home/vcap/utils
@@ -85,6 +87,8 @@ services:
     image: notifications-api
     container_name: notify-api-celery
     profiles:
+      - full
+      - lite
       - notify-api
     volumes:
       - ../notifications-api:/home/vcap/app
@@ -114,6 +118,7 @@ services:
     image: notifications-api
     container_name: notify-api-celery-beat
     profiles:
+      - full
       - beat
     volumes:
       - ../notifications-api:/home/vcap/app
@@ -141,7 +146,9 @@ services:
     image: notifications-admin
     container_name: notify-admin
     profiles:
-      - notify-admin
+      - full
+      - lite
+      - admin
     volumes:
       - ../notifications-admin:/home/vcap/app
       - /home/vcap/app/node_modules/
@@ -178,6 +185,9 @@ services:
   document-download-api:
     image: document-download-api
     container_name: document-download-api
+    profiles:
+      - full
+      - documents
     volumes:
       - ../document-download-api:/home/vcap/app
     build:
@@ -204,6 +214,9 @@ services:
     image: document-download-frontend
     platform: linux/amd64
     container_name: document-download-frontend
+    profiles:
+      - full
+      - documents
     volumes:
       - ../document-download-frontend:/home/vcap/app
     build:
@@ -227,6 +240,9 @@ services:
   template-preview-api:
     image: template-preview-api
     container_name: template-preview-api
+    profiles:
+      - full
+      - templates
     volumes:
       - ../notifications-template-preview:/home/vcap/app
       - ../notifications-utils:/home/vcap/utils
@@ -255,6 +271,9 @@ services:
   template-preview-celery:
     image: template-preview-api
     container_name: template-preview-celery
+    profiles:
+      - full
+      - templates
     volumes:
       - ../notifications-template-preview:/home/vcap/app
       - ../notifications-utils:/home/vcap/utils
@@ -265,11 +284,12 @@ services:
     restart: always
     networks:
       apps:
-
+  
   antivirus-api:
     image: antivirus-api
     container_name: antivirus-api
     profiles:
+      - full
       - antivirus
     volumes:
       - ../notifications-antivirus:/home/vcap/app
@@ -281,6 +301,7 @@ services:
       args:
         - NOTIFY_ENVIRONMENT=development
         - BASE_IMAGE=base
+        - CLAMAV_USE_MIRROR=false
     ports:
       - "6016:6016"
     entrypoint: ["./scripts/run_app.sh"]
@@ -300,6 +321,7 @@ services:
     image: antivirus-api
     container_name: antivirus-celery
     profiles:
+      - full
       - antivirus
     volumes:
       - ../notifications-antivirus:/home/vcap/app
@@ -310,6 +332,7 @@ services:
       args:
         - NOTIFY_ENVIRONMENT=development
         - BASE_IMAGE=base
+        - CLAMAV_USE_MIRROR=false
     entrypoint: ["./scripts/run_celery.sh"]
     stdin_open: true
     tty: true
@@ -326,6 +349,7 @@ services:
     image: sms-provider-stub
     container_name: sms-provider-stub
     profiles:
+      - full
       - sms-provider-stub
     build:
       context: ../notifications-sms-provider-stub

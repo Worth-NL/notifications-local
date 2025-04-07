@@ -4,7 +4,7 @@ setup:
 	@if [ "$(shell uname)" = "Linux" ]; then \
 		echo "Running on Linux"; \
 		sudo apt-get update; \
-		sudo apt-get install -y curl git pass; \
+		sudo apt-get install -y build-essential curl git pass zlib1g-dev libbz2-dev libncurses-dev libffi-dev libreadline-dev libsqlite3-dev tk-dev liblzma-dev zlib1g-dev libssl-dev libgdbm-dev libnss3-dev libgdbm-compat-dev uuid-dev libcurl4-openssl-dev; \
 	elif [ "$(shell uname)" = "Darwin" ]; then \
 		echo "Running on macOS"; \
 		brew install coreutils curl git pass; \
@@ -34,3 +34,18 @@ setup:
 	
 	@echo "Generating required files"
 	@sh generate-env-files.sh
+
+.PHONY: requirements
+requirements:
+	@echo "Installing Pre-Requirements"
+	@if [ "$(shell uname)" = "Linux" ]; then \
+		echo "Running on Linux"; \
+		sudo apt-get update; \
+		sudo apt-get install -y build-essential curl git pass zlib1g-dev libbz2-dev libncurses-dev libffi-dev libreadline-dev libsqlite3-dev tk-dev liblzma-dev zlib1g-dev libssl-dev libgdbm-dev libnss3-dev libgdbm-compat-dev uuid-dev libcurl4-openssl-dev; \
+	elif [ "$(shell uname)" = "Darwin" ]; then \
+		echo "Running on macOS"; \
+		brew install coreutils curl git pass; \
+	else \
+		echo "Unknown OS"; \
+		exit 1; \
+	fi

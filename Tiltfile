@@ -5,8 +5,12 @@ available_profiles = [
   'sms-provider-stub',
   'beat',
   'antivirus',
-  'notify-api',
-  'notify-admin'
+  'documents',
+  'templates',
+  'api',
+  'admin',
+  'lite',
+  'full'
 ]
 
 profiles = []
@@ -42,8 +46,13 @@ if config.tilt_subcommand == 'up':
       if repo == 'notifynl-frontend-jinja':
         local(command='git checkout notifynl/rijkshuisstijl', dir='../{}'.format(repo), quiet=True, echo_off=True)
 
+    local(command='asdf install', dir='../{}'.format(repo), quiet=True, echo_off=True)
+
   # Repo fixes
   ## General
+  local(command='asdf install', quiet=True, echo_off=True)
+  local(command='asdf reshim', quiet=True, echo_off=True)
+
   if not os.path.exists(path='./data/db'):
     local(command='mkdir -p ./data/db', quiet=True, echo_off=True)
 
@@ -102,31 +111,37 @@ docker_compose('./docker-compose.yml', profiles=profiles)
 dc_resource('db', labels=['plumbing'], trigger_mode=TRIGGER_MODE_MANUAL)
 dc_resource('redis', labels=['plumbing'], trigger_mode=TRIGGER_MODE_MANUAL)
 dc_resource('notify-api-db-migration', labels=['plumbing'], trigger_mode=TRIGGER_MODE_MANUAL, resource_deps=['db'])
-dc_resource('document-download-api', labels=['document-download'], links=['http://api.document-download.localhost:7000'], infer_links=False)
-dc_resource('document-download-frontend', labels=['document-download'], links=['http://frontend.document-download.localhost:7001'], resource_deps=['document-download-api'], infer_links=False)
-dc_resource('template-preview-api', labels=['template-preview'], links=['http://template-preview-api.localhost:6013'], infer_links=False)
-dc_resource('template-preview-celery', labels=['template-preview'], resource_deps=['document-download-api'])
 
-## From 'notify-api' profile
-if 'notify-api' in profiles:
+## From 'api' profile
+if any([keyword in profiles for keyword in ['api', 'lite', 'full']]):
   dc_resource('notify-api', labels=['notify'], links=['http://notify-api.localhost:6011', 'http://notify-api.localhost:5678'], resource_deps=['notify-api-db-migration', 'db', 'redis', 'template-preview-api'], infer_links=False)
   dc_resource('notify-api-celery', labels=['notify'], resource_deps=['db', 'redis'])
 
-## From 'notify-admin' profile
-if 'notify-admin' in profiles:
+## From 'admin' profile
+if any([keyword in profiles for keyword in ['admin', 'lite', 'full']]):
   dc_resource('notify-admin', labels=['notify'], links=['http://notify.localhost:6012', 'http://notify.localhost:5679'], resource_deps=['notify-api', 'template-preview-api'], infer_links=False)
 
+## From 'documents' profile
+if any([keyword in profiles for keyword in ['documents', 'full']]):
+  dc_resource('document-download-api', labels=['document-download'], links=['http://api.document-download.localhost:7000'], infer_links=False)
+  dc_resource('document-download-frontend', labels=['document-download'], links=['http://frontend.document-download.localhost:7001'], resource_deps=['document-download-api'], infer_links=False)
+
+## From 'templates' profile
+if any([keyword in profiles for keyword in ['documents', 'full']]):
+  dc_resource('template-preview-api', labels=['template-preview'], links=['http://template-preview-api.localhost:6013'], infer_links=False)
+  dc_resource('template-preview-celery', labels=['template-preview'], resource_deps=['document-download-api'])
+
 ## From 'beat' profile
-if 'beat' in profiles:
-  dc_resource('notify-api-celery-beat', labels=['notify'], resource_deps=['db', 'redis'])
+if any([keyword in profiles for keyword in ['beat', 'full']]):
+  dc_resource('notify-api-celery-beat', labels=['notify'], resource_deps=['db', 'redis', 'notify-api'])
 
 ## From 'antivirus' profile
-if 'antivirus' in profiles:
+if any([keyword in profiles for keyword in ['antivirus', 'full']]):
   dc_resource('antivirus-api', labels=['antivirus'], links=['http://antivirus-api.localhost:6016'], infer_links=False)
   dc_resource('antivirus-celery', labels=['antivirus'], resource_deps=['antivirus-api'])
 
 ## From 'sms-provider-stub' profile
-if 'sms-provider-stub' in profiles:
+if any([keyword in profiles for keyword in ['sms-provider-stub', 'full']]):
   dc_resource('sms-provider-stub', labels=['side-services'])
 
 ## Misc fixes, set as buttons because local commands happen before docker compose
@@ -156,4 +171,5 @@ cmd_button(name='nav-open-code',
            argv=['code', '../notifynl.code-workspace'],
            text='Open VSCode',
            location=location.NAV,
-           icon_name='code')
+           icon_name='code'
+)
